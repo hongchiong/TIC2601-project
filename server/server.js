@@ -1,2 +1,17 @@
-//remove console logs
-console.log("removed console logs")
+var express = require('express');
+var app = express();
+
+app.get('/', function (req, res) {
+  res.send('Our web app');
+});
+
+app.get('/about', function (req, res) {
+  res.send('Project group');
+});
+
+var server = app.listen(8081, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+
+  console.log('Example app listening at http://localhost%s%s', host, port);
+});
