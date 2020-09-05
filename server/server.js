@@ -1,2 +1,2 @@
-console.log("HElloworld")
-console.log("done 2")
+//remove console logs
+console.log("removed console logs")
