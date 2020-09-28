@@ -37,7 +37,7 @@ source seedDB.sql
 
 For the app to connect to the database in your local machine, you need to configure some parameters in the .env file, you can see .env.example for an example. Basically add your database user and password values into .env.
 
-After successful installation, you should be able to run the app with 'npm run dev' and access the app at [localhost:8081]("http://localhost:8081/").
+After successful installation, you should be able to run the app with 'npm run dev' and access the app at [localhost:8081](http://localhost:8081/).
 
 ```bash
 npm run dev
@@ -45,7 +45,7 @@ npm run dev
 
 ### Frontend
 
-The frontend package manager is yarn as opposed to npm (which we used in the backend), you might need to install [yarn]("https://yarnpkg.com/getting-started/install") in your machine.
+The frontend package manager is yarn as opposed to npm (which we used in the backend), you might need to install [yarn](https://yarnpkg.com/getting-started/install) in your machine.
 
 ```bash
 npm install -g yarn
@@ -58,7 +58,7 @@ cd client
 yarn install
 ```
 
-After successful installation, you should be able to run the app with 'yarn dev' and access the app at [localhost:3000]("http://localhost:3000/").
+After successful installation, you should be able to run the app with 'yarn dev' and access the app at [localhost:3000](http://localhost:3000/).
 
 ```bash
 yarn dev
@@ -66,7 +66,7 @@ yarn dev
 
 ## Usage
 
-To see the whole thing working together, you need to start both applications concurrently and the frontend should be able to retrieve 'users' data, at page [/users]("http://localhost:3000/users") from your backend.
+To see the whole thing working together, you need to start both applications concurrently and the frontend should be able to retrieve 'users' data, at page [/users](http://localhost:3000/users) from your backend.
 
 Start backend
 
@@ -82,4 +82,4 @@ cd client
 yarn dev
 ```
 
-Go to [localhost:3000]("http://localhost:3000/") and you should see everything working.
+Go to [localhost:3000](http://localhost:3000/) and you should see everything working.
