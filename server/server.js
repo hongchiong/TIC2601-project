@@ -1,12 +1,23 @@
 var express = require('express');
+var db = require('./db.js');
+var cors = require('cors');
 var app = express();
+var bodyParser = require('body-parser');
 
-app.get('/', function (req, res) {
-  res.send('Our web app');
-});
+app.use(cors());
+app.use(bodyParser.json());
 
-app.get('/about', function (req, res) {
-  res.send('Project group');
+app.get('/', (req, res) => res.send('Hello World!'));
+
+app.get('/users', (req, res) => {
+  db.query('SELECT * FROM users;', (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Users retrieved successfully.',
+    });
+  });
 });
 
 var server = app.listen(8081, function () {
