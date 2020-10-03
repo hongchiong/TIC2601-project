@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => res.send('Hello World!'));
 
 app.get('/users', (req, res) => {
-  db.query('SELECT * FROM users;', (err, data, fields) => {
+  db.query('SELECT id, email, address, name, admin FROM users;', (err, data, fields) => {
     if (err) throw err;
     res.json({
       status: 200,
@@ -18,6 +18,50 @@ app.get('/users', (req, res) => {
       message: 'Users retrieved successfully.',
     });
   });
+});
+
+app.get('/items', (req, res) => {
+  db.query(
+    'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.name ASC;',
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Items retrieved successfully.',
+      });
+    }
+  );
+});
+
+app.post('/login', (req, res) => {
+  db.query(
+    `SELECT id, email, address, name, admin FROM users WHERE users.email="${req.body.email}" AND users.password="${req.body.password}";`,
+    (err, data, fields) => {
+      if (err) throw err;
+      if (data.length === 0) {
+        res.status(204).send('No such user found');
+      } else {
+        res.status(200).json({
+          data,
+          message: 'User logged in successfully',
+        });
+      }
+    }
+  );
+});
+
+app.post('/signup', (req, res) => {
+  db.query(
+    `INSERT INTO users (email, password, name, address, admin) VALUES ("${req.body.email}", "${req.body.password}", "${req.body.name}", "${req.body.address}", false);`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.status(200).json({
+        data,
+        message: 'User signed up successfully',
+      });
+    }
+  );
 });
 
 var server = app.listen(8081, function () {

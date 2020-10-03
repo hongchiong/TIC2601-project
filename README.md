@@ -23,7 +23,6 @@ cd into the server/db folder and execute the sql commands in order
 
 1. createDB.sql (Create the database)
 2. createTable.sql (Create the table/s)
-3. seedDB.sql (Add some initial data into the database)
 
 Many ways to do this. I did it by
 
@@ -32,7 +31,12 @@ cd server/db
 mysql
 source createDB.sql
 source createTable.sql
-source seedDB.sql
+```
+
+seed table by executing the script seed.js by
+
+```bash
+node seed.js
 ```
 
 For the app to connect to the database in your local machine, you need to configure some parameters in the .env file, you can see .env.example for an example. Basically add your database user and password values into .env.

@@ -3,6 +3,7 @@
 import React from 'react';
 import App from 'next/app';
 import GlobalStyles from '../styles/GlobalStyles';
+import { AuthProvider } from '../components/Contexts/AuthContext';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -11,8 +12,10 @@ class MyApp extends App {
     const { Component, pageProps } = this.props;
     return (
       <>
-        <GlobalStyles />
-        <Component {...pageProps} />
+        <AuthProvider>
+          <GlobalStyles />
+          <Component {...pageProps} />
+        </AuthProvider>
       </>
     );
   }

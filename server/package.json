@@ -17,6 +17,7 @@
     "mysql": "^2.18.1"
   },
   "devDependencies": {
+    "faker": "^5.1.0",
     "nodemon": "^2.0.4"
   }
 }

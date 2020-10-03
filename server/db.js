@@ -1,10 +1,12 @@
 require('dotenv').config();
 var mysql = require('mysql');
+
 var connection = mysql.createConnection({
   host: process.env.DBHOST,
   user: process.env.DBUSER,
   password: process.env.DBPASSWORD,
   database: process.env.DBNAME,
+  port: process.env.DBPORT,
 });
 
 connection.connect(function (err) {
@@ -15,7 +17,7 @@ connection.connect(function (err) {
     if (err) throw err;
 
     // if there is no error, you have the result
-    console.log(result);
+    // console.log(result);
   });
 });
 
