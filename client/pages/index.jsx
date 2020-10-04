@@ -9,7 +9,9 @@ const Index = () => {
 
   if (error) return 'An error has occurred.';
   if (!items) return 'Loading...';
+
   console.log(items);
+
   return (
     <PageLayout title='TIC2601 Ecommerce'>
       <h1>All Products</h1>

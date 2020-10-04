@@ -34,6 +34,21 @@ app.get('/items', (req, res) => {
   );
 });
 
+app.get('/categories', (req, res) => {
+  db.query(
+    'SELECT * FROM categories;',
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Categories retrieved successfully.',
+      });
+    }
+  );
+});
+
+
 app.post('/login', (req, res) => {
   db.query(
     `SELECT id, email, address, name, admin FROM users WHERE users.email="${req.body.email}" AND users.password="${req.body.password}";`,
