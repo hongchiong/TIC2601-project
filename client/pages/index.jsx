@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import Link from 'next/link';
+
+import AuthContext from '../components/Contexts/AuthContext';
 import useSWR from 'swr';
 import { fetcher } from '../utils';
 import PageLayout from '../components/Layout/PageLayout';
@@ -8,9 +11,9 @@ const Index = () => {
   const { data: items, error } = useSWR('http://localhost:8081/items', fetcher);
 
   if (error) return 'An error has occurred.';
-  if (!items) return 'Loading...';
+  if (!items) return '';
 
-  console.log(items);
+  const { addToCart } = useContext(AuthContext);
 
   return (
     <PageLayout title='TIC2601 Ecommerce'>
@@ -18,13 +21,25 @@ const Index = () => {
       <div className='items-container'>
         {items.data.map((item) => (
           <div className='items-card'>
-            <h5>{item.itemName}</h5>
+            <Link href={`/items/${item.id}`} passHref>
+              <a href={`/items/${item.id}`}>
+                <h5>{item.itemName}</h5>
+              </a>
+            </Link>
             <p>Price: ${item.price}</p>
             <p>Quantity: {item.quantity}</p>
-            <p>Posted by: {item.userName}</p>
+            <p>
+              Posted by:{' '}
+              <Link href={`/users/${item.user_id}`} passHref>
+                <a href={`/users/${item.user_id}`}>{item.userName}</a>
+              </Link>
+            </p>
+
             <Button
               variant='primary'
-              onClick={() => alert(`Adding ${item.itemName} to cart`)}>
+              onClick={() => {
+                addToCart(item);
+              }}>
               Add to cart
             </Button>
           </div>
@@ -52,6 +67,10 @@ const Index = () => {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+          }
+
+          a {
+            text-decoration: none;
           }
         `}
       </style>

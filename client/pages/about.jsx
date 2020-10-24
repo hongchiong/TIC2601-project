@@ -10,7 +10,7 @@ const About = () => {
   );
 
   if (error) return 'An error has occurred.';
-  if (!categories) return 'Loading...';
+  if (!categories) return '';
 
   console.log(categories);
   return (

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import AuthContext from '../Contexts/AuthContext';
+import { isEmptyObj } from '../../utils';
 import { Navbar, Nav, Container, Button, Modal, Form } from 'react-bootstrap';
 
 const PageLayout = ({ title, children }) => {
@@ -14,7 +15,7 @@ const PageLayout = ({ title, children }) => {
     address: '',
   });
 
-  const { login, signup } = useContext(AuthContext);
+  const { login, signup, cart, user, logout } = useContext(AuthContext);
 
   return (
     <>
@@ -35,19 +36,38 @@ const PageLayout = ({ title, children }) => {
             </Nav>
 
             <div className='buttons-container'>
-              <Button
-                variant='outline-primary'
-                onClick={() => setShowLogin(true)}>
-                Login
-              </Button>
+              {isEmptyObj(user) ? (
+                <>
+                  <Button
+                    variant='outline-primary'
+                    onClick={() => setShowLogin(true)}>
+                    Login
+                  </Button>
 
-              <Button
-                variant='outline-primary'
-                onClick={() => setShowSignup(true)}>
-                Signup
-              </Button>
+                  <Button
+                    variant='outline-primary'
+                    onClick={() => setShowSignup(true)}>
+                    Signup
+                  </Button>
+                </>
+              ) : (
+                <Button variant='outline-primary' onClick={() => logout()}>
+                  Logout
+                </Button>
+              )}
             </div>
-            <div>Cart: 0</div>
+            <Link href='/checkout' passHref>
+              <a href='/checkout'>
+                Cart:{' '}
+                {cart
+                  ? cart.reduce(
+                      (accumulator, currentValue) =>
+                        accumulator + currentValue.quantity,
+                      0
+                    )
+                  : 0}
+              </a>
+            </Link>
           </Navbar.Collapse>
         </Navbar>
         {children}

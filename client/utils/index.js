@@ -16,3 +16,14 @@ export const handleAPIResponse = (err, res) => {
   }
   return [err, res.data];
 };
+
+
+export const isEmptyObj = (obj) => {
+  if (obj === undefined) return true;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in obj) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (obj.hasOwnProperty(key)) return false;
+  }
+  return true;
+};

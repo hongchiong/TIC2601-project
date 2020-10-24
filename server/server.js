@@ -20,6 +20,17 @@ app.get('/users', (req, res) => {
   });
 });
 
+app.get('/users/:userId', (req, res) => {
+  db.query('SELECT id, email, address, name, admin FROM users;', (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Users retrieved successfully.',
+    });
+  });
+});
+
 app.get('/items', (req, res) => {
   db.query(
     'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.name ASC;',
@@ -29,6 +40,21 @@ app.get('/items', (req, res) => {
         status: 200,
         data,
         message: 'Items retrieved successfully.',
+      });
+    }
+  );
+});
+
+
+app.get('/items/:itemId', (req, res) => {
+  db.query(
+    `SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id WHERE items.id="${req.params.itemId}";`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Item retrieved successfully.',
       });
     }
   );
