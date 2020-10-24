@@ -19,17 +19,25 @@ const Likes = ({ userData, me }) => {
 
   return (
     <div className='likes-root'>
-      {isSuccess &&
-        userLikedItems.data.map((item, i) => (
-          <Link href={`/items/${item.item_id}`} passHref>
-            <a href={`/items/${item.item_id}`}>
-              {i + 1}. {item.name} @ ${item.price}
-            </a>
-          </Link>
-        ))}
+      <div className='likes-container'>
+        {isSuccess &&
+          userLikedItems.data.map((item, i) => (
+            <Link href={`/items/${item.item_id}`} passHref>
+              <a href={`/items/${item.item_id}`}>
+                {i + 1}. {item.name} @ ${item.price}
+              </a>
+            </Link>
+          ))}
+      </div>
+
       <style jsx>{`
         .likes-root {
           padding: 2% 0;
+        }
+
+        a {
+          display: block;
+          margin-bottom: 8px;
         }
       `}</style>
     </div>

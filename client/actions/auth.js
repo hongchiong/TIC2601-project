@@ -181,3 +181,36 @@ export const getUserLikedItems = async (key, userId) => {
   }
   return res.data;
 };
+
+export const createOrder = async (user_id, items) => {
+  const url = 'http://localhost:8081/orders';
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'post',
+      data: {
+        user_id,
+        items,
+      },
+    })
+  );
+
+  console.log(err, res);
+  return [err, res];
+};
+
+export const getAllOrdersItems = async (key, userId) => {
+  const url = `http://localhost:8081/orders/me/${userId}`;
+
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'get',
+    }),
+  );
+
+  if (err) {
+    return err.data;
+  }
+  return res.data;
+};

@@ -9,6 +9,7 @@ import Account from '../../components/Sections/Account';
 import Items from '../../components/Sections/Items';
 import Comments from '../../components/Sections/Comments';
 import Likes from '../../components/Sections/Likes';
+import Orders from '../../components/Sections/Orders';
 import { getUser } from '../../actions/auth';
 
 const User = () => {
@@ -48,7 +49,7 @@ const User = () => {
             <Comments userData={userData} me={me} loggedInUserId={user.id} />
           ),
           Likes: <Likes userData={userData} me={me} />,
-          // Orders: <Orders />,
+          Orders: <Orders userData={userData} me={me} />,
         }[key]}
       <style jsx>{`
         h1 {

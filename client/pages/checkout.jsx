@@ -4,38 +4,53 @@ import ProductListView from '../components/Products/ProductListView';
 import AuthContext from '../components/Contexts/AuthContext';
 import Button from 'react-bootstrap/Button';
 import { isEmptyObj } from '../utils/index';
+import { createOrder } from '../actions/auth';
+import { toast } from 'react-toastify';
 
 const Checkout = () => {
   const { user, cart, emptyCart } = useContext(AuthContext);
 
   return (
     <PageLayout title='TIC2601 Ecommerce'>
-      {cart.map((item) => (
-        <ProductListView item={item} />
-      ))}
-      <div className='cart-details'>
-        <p>
-          Total Cost: $
-          {cart
-            ? cart.reduce(
-                (accumulator, currentValue) => accumulator + currentValue.price,
-                0
-              )
-            : 0}
-        </p>
+      <div className='cart-root'>
+        {cart.map((item) => (
+          <ProductListView item={item} />
+        ))}
+        <div className='cart-details'>
+          <p>
+            Total Cost: $
+            {cart
+              ? cart.reduce(
+                  (accumulator, currentValue) =>
+                    accumulator + currentValue.price,
+                  0
+                )
+              : 0}
+          </p>
 
-        <Button variant='primary' onClick={() => emptyCart()}>
-          Empty Cart
-        </Button>
-        <Button
-          variant='primary'
-          onClick={() => alert('checkout endpoint')}
-          disabled={isEmptyObj(user)}>
-          Checkout
-        </Button>
+          <Button variant='primary' onClick={() => emptyCart()}>
+            Empty Cart
+          </Button>
+          <Button
+            variant='primary'
+            onClick={async () => {
+              const [err, res] = await createOrder(user.id, cart);
+              if (err) {
+                toast.warning('Order failed');
+                return;
+              }
+              toast.success('Order successful!');
+              emptyCart();
+            }}
+            disabled={isEmptyObj(user)}>
+            Checkout
+          </Button>
+        </div>
       </div>
+
       <style jsx>{`
-        h1 {
+        .cart-root {
+          padding: 2% 0;
         }
 
         .cart-details {

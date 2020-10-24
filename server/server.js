@@ -94,20 +94,59 @@ app.post('/comment', (req, res) => {
   );
 });
 
-
-
-//Get all orders by user\
+//Get all order items by user
 app.get('/orders/me/:userId', (req, res) => {
-  db.query(`SELECT * FROM orders INNER JOIN items ON users.id = comments.receiver WHERE comments.sender_id = ${req.params.userId};`, (err, data, fields) => {
+  db.query(`SELECT order_items.item_id, order_items.order_id, order_items.quantity, items.name, items.price, items.description FROM orders INNER JOIN order_items ON orders.id = order_items.order_id INNER JOIN items ON items.id = order_items.item_id WHERE orders.user_id = ${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;
-    res.json({
-      status: 200,
-      data,
-      message: 'Items retrieved successfully.',
+
+
+    db.query(`SELECT id FROM orders WHERE orders.user_id = ${req.params.userId};`, (err2, data2, fields) => {
+      if (err2) throw err;
+  
+
+    
+      res.json({
+        status: 200,
+        data,
+        orderIds: data2,
+        message: 'Orders retrieved successfully.',
+      });
     });
   });
 });
 
+//Create order for user
+app.post('/orders', (req, res) => {
+  db.query(
+    `INSERT INTO orders (user_id, status) VALUES ("${req.body.user_id}", "completed");`,
+    (err, data, fields) => {
+      if (err) throw err;
+
+      for (let i = 0; i < req.body.items.length; i++) {
+        db.query(
+          `INSERT INTO order_items (order_id, item_id, quantity) VALUES ("${data.insertId}", "${req.body.items[i].id}", "${req.body.items[i].quantity}");`,
+          (err2, data2, fields2) => {
+            if (err2) throw err2;
+          }
+        );
+
+        db.query(
+          `UPDATE items SET quantity = quantity - ${req.body.items[i].quantity} WHERE items.id = "${req.body.items[i].id}"`,
+          (err3, data3, fields3) => {
+            if (err3) throw err3;
+          }
+        );
+      }
+
+      res.json({
+        status: 200,
+        data,
+        message: 'Items retrieved successfully.',
+      });
+      
+    }
+  );
+});
 
 app.get('/items', (req, res) => {
   db.query(
