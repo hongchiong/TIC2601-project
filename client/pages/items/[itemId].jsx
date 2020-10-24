@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import Link from 'next/link';
+import { useQuery, useMutation, queryCache } from 'react-query';
 
 import { useRouter } from 'next/router';
 import useSWR, { mutate } from 'swr';
@@ -7,31 +8,42 @@ import { fetcher, isEmptyObj } from '../../utils';
 import AuthContext from '../../components/Contexts/AuthContext';
 import PageLayout from '../../components/Layout/PageLayout';
 import Button from 'react-bootstrap/Button';
-import { DeleteLikeItem } from '../../actions/auth';
+import { getAllUserLikes } from '../../actions/auth';
 
 const Item = () => {
   const router = useRouter();
   const { itemId } = router.query;
 
-  const { user, addToCart, likeItem } = useContext(AuthContext);
+  const { user, addToCart, likeItem, deleteLikeItem } = useContext(AuthContext);
 
   const { data: item, error } = useSWR(
     `http://localhost:8081/items/${itemId}`,
     fetcher
   );
 
-  const { data: userLike, error: userLikeError } = useSWR(
-    `http://localhost:8081/items/likes/${itemId}/users/${user.id}`,
-    fetcher
+  // const { data: userLike, error: userLikeError } = useSWR(
+  //   `http://localhost:8081/items/likes/${itemId}/users/${user.id}`,
+  //   fetcher
+  // );
+  const { data: userLike, isSucess: loadingUserLike } = useQuery(
+    ['userLike', itemId, user.id],
+    getAllUserLikes
   );
 
-  console.log(userLike, userLikeError);
+  const [mutate, { isLoading }] = useMutation(getAllUserLikes, {
+    onSuccess: () => {
+      queryCache.invalidateQueries('userLike');
+      // console.log(newRes);
+      // queryCache.setQueryData('userLike', () => {
+      //   return newRes;
+      // });
+    },
+  });
 
   if (error) return 'An error has occurred.';
   if (!item) return '';
 
-  console.log(item);
-  console.log(user);
+  console.log(userLike);
   return (
     <PageLayout title='TIC2601 Ecommerce'>
       <h1>{item.data[0] && item.data[0].itemName}</h1>
@@ -56,13 +68,11 @@ const Item = () => {
           variant='primary'
           onClick={() => {
             if (userLike && userLike.data.length > 0) {
-              DeleteLikeItem(user.id, item.data[0].id);
+              deleteLikeItem(user.id, item.data[0].id);
             } else {
               likeItem(user.id, item.data[0].id);
             }
-            mutate(
-              `http://localhost:8081/items/likes/${itemId}/users/${user.id}`
-            );
+            mutate(item.data[0].id, user.id);
           }}
           disabled={isEmptyObj(user)}>
           {userLike && userLike.data.length > 0 ? 'Unlike' : 'Like'}

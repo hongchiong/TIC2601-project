@@ -78,3 +78,20 @@ export const DeleteLikeItem = async (userId, itemId) => {
   // return handleAPIResponse(err, res);
   return [err, res];
 };
+
+
+export const getAllUserLikes = async (key, itemId, userId) => {
+  const url = `http://localhost:8081/items/likes/${itemId}/users/${userId}`;
+
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'get',
+    }),
+  );
+
+  if (err) {
+    return err.data;
+  }
+  return res.data;
+};

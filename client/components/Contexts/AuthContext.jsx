@@ -84,13 +84,13 @@ class AuthProvider extends Component {
     return res;
   }
 
-  async deleteLikeItem() {
+  async deleteLikeItem(userId, itemId) {
     const [err, res] = await DeleteLikeItem(userId, itemId);
     if (err) {
       console.log(err);
       return;
     }
-    toast.success(`You deleted your like on item ID:${itemId}`);
+    toast.warning(`You deleted your like on item ID:${itemId}`);
     return res;
   }
 
