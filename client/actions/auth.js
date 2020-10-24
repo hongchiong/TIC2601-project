@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { queryCache } from 'react-query';
+
 import {
   handleAPIResponse,
   to
@@ -82,6 +84,90 @@ export const DeleteLikeItem = async (userId, itemId) => {
 
 export const getAllUserLikes = async (key, itemId, userId) => {
   const url = `http://localhost:8081/items/likes/${itemId}/users/${userId}`;
+
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'get',
+    }),
+  );
+
+  if (err) {
+    return err.data;
+  }
+  return res.data;
+};
+
+
+export const getUser = async (key, userId) => {
+  const url = `http://localhost:8081/users/${userId}`;
+
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'get',
+    }),
+  );
+
+  if (err) {
+    return err.data;
+  }
+  return res.data;
+};
+
+export const getUserItems = async (key, userId) => {
+  const url = `http://localhost:8081/items/me/${userId}`;
+
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'get',
+    }),
+  );
+
+  if (err) {
+    return err.data;
+  }
+  return res.data;
+};
+
+export const getUserComments = async (key, userId) => {
+  const url = `http://localhost:8081/comments/users/${userId}`;
+
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'get',
+    }),
+  );
+
+  if (err) {
+    return err.data;
+  }
+  queryCache.invalidateQueries('userComments');
+  return res.data;
+};
+
+export const postComment = async (sender_id, receiver_id, comment) => {
+  const url = 'http://localhost:8081/comment';
+  const [err, res] = await to(
+    axios.request({
+      url,
+      method: 'post',
+      data: {
+        sender_id,
+        receiver_id,
+        comment
+      },
+    })
+  );
+  console.log(err, res);
+  return [err, res];
+};
+
+//Get all likes by user
+export const getUserLikedItems = async (key, userId) => {
+  const url = `http://localhost:8081/likes/me/${userId}`;
 
   const [err, res] = await to(
     axios.request({

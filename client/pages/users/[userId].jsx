@@ -1,12 +1,15 @@
-import React, { useContext } from 'react';
-// import Link from 'next/link';
-
+import React, { useState, useContext } from 'react';
+import { useQuery } from 'react-query';
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 import { useRouter } from 'next/router';
-import useSWR from 'swr';
-import { fetcher } from '../../utils';
 import AuthContext from '../../components/Contexts/AuthContext';
 import PageLayout from '../../components/Layout/PageLayout';
-// import Button from 'react-bootstrap/Button';
+import Account from '../../components/Sections/Account';
+import Items from '../../components/Sections/Items';
+import Comments from '../../components/Sections/Comments';
+import Likes from '../../components/Sections/Likes';
+import { getUser } from '../../actions/auth';
 
 const User = () => {
   const router = useRouter();
@@ -14,20 +17,39 @@ const User = () => {
 
   const { user } = useContext(AuthContext);
 
-  console.log(user.id === userId);
-
-  const { data: item, error } = useSWR(
-    `http://localhost:8081/users/${userId}`,
-    fetcher
+  const { data: userData, isSuccess } = useQuery(
+    ['userData', userId],
+    getUser,
+    {
+      enabled: userId,
+    }
   );
 
-  if (error) return 'An error has occurred.';
-  if (!item) return '';
+  const [key, setKey] = useState('Account');
+  const me = userId == user.id;
 
-  console.log(item);
   return (
     <PageLayout title='TIC2601 Ecommerce'>
-      <h1>User: {userId}</h1>
+      <Tabs
+        id='controlled-tab-example'
+        activeKey={key}
+        onSelect={(k) => setKey(k)}>
+        <Tab eventKey='Account' title='Account'></Tab>
+        <Tab eventKey='Items' title='Items'></Tab>
+        <Tab eventKey='Comments' title='Comments'></Tab>
+        {me && <Tab eventKey='Likes' title='Likes'></Tab>}
+        {me && <Tab eventKey='Orders' title='Orders'></Tab>}
+      </Tabs>
+      {isSuccess &&
+        {
+          Account: <Account userData={userData} me={me} />,
+          Items: <Items userData={userData} me={me} />,
+          Comments: (
+            <Comments userData={userData} me={me} loggedInUserId={user.id} />
+          ),
+          Likes: <Likes userData={userData} me={me} />,
+          // Orders: <Orders />,
+        }[key]}
       <style jsx>{`
         h1 {
         }

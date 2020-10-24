@@ -56,6 +56,12 @@ const PageLayout = ({ title, children }) => {
                 </Button>
               )}
             </div>
+            {!isEmptyObj(user) && (
+              <Link href={`/users/${user.id}`} passHref>
+                <a href={`/users/${user.id}`}>My Account</a>
+              </Link>
+            )}
+
             <Link href='/checkout' passHref>
               <a href='/checkout'>
                 Cart:{' '}
@@ -173,6 +179,10 @@ const PageLayout = ({ title, children }) => {
             width: 20%;
             display: flex;
             justify-content: space-around;
+          }
+
+          a {
+            margin-left: 12px;
           }
         `}
       </style>

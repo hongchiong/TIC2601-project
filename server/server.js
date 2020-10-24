@@ -21,7 +21,7 @@ app.get('/users', (req, res) => {
 });
 
 app.get('/users/:userId', (req, res) => {
-  db.query('SELECT id, email, address, name, admin FROM users;', (err, data, fields) => {
+  db.query(`SELECT id, email, address, name, admin FROM users WHERE users.id=${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;
     res.json({
       status: 200,
@@ -45,42 +45,58 @@ app.get('/items/me/:userId', (req, res) => {
 
 //Get all likes by user
 app.get('/likes/me/:userId', (req, res) => {
-  db.query(`SELECT * FROM like_items INNER JOIN items ON items.id = like_items.item_id WHERE like_items.user_id = ${req.params.userId};`, (err, data, fields) => {
+  db.query(`SELECT items.name, like_items.item_id, like_items.user_id, items.description, items.category_id, items.price, items.quantity FROM like_items INNER JOIN items ON items.id = like_items.item_id WHERE like_items.user_id = ${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;
     res.json({
       status: 200,
       data,
-      message: 'Items retrieved successfully.',
+      message: 'Likes retrieved successfully.',
     });
   });
 });
 
 //Get all comments SENT by user
 app.get('/comments/me/:userId', (req, res) => {
-  db.query(`SELECT * FROM comments INNER JOIN users ON users.id = comments.receiver_id WHERE comments.sender_id = ${req.params.userId};`, (err, data, fields) => {
+  db.query(`SELECT users.name, users.email, users.address, comments.id, sender_id, receiver_id, comment FROM comments INNER JOIN users ON users.id = comments.receiver_id WHERE comments.sender_id = ${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;
     res.json({
       status: 200,
       data,
-      message: 'Items retrieved successfully.',
+      message: 'Comments retrieved successfully.',
     });
   });
 });
 
 //Get all comments RECEIVED by user
 app.get('/comments/users/:userId', (req, res) => {
-  db.query(`SELECT * FROM comments INNER JOIN users ON users.id = comments.sender_id WHERE comments.receiver_id = ${req.params.userId};`, (err, data, fields) => {
+  db.query(`SELECT users.name, users.email, users.address, comments.id, sender_id, receiver_id, comment FROM comments INNER JOIN users ON users.id = comments.sender_id WHERE comments.receiver_id = ${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;
     res.json({
       status: 200,
       data,
-      message: 'Items retrieved successfully.',
+      message: 'Comments retrieved successfully.',
     });
   });
 });
 
-//Get all orders by user
-//Get all comments SENT by user
+
+//Comment on a user
+app.post('/comment', (req, res) => {
+  db.query(
+    `INSERT INTO comments (sender_id, receiver_id, comment) VALUES (${req.body.sender_id}, ${req.body.receiver_id}, "${req.body.comment}");`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.status(200).json({
+        data,
+        message: 'Comment posted successfully',
+      });
+    }
+  );
+});
+
+
+
+//Get all orders by user\
 app.get('/orders/me/:userId', (req, res) => {
   db.query(`SELECT * FROM orders INNER JOIN items ON users.id = comments.receiver WHERE comments.sender_id = ${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;

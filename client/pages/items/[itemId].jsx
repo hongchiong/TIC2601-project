@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useQuery, useMutation, queryCache } from 'react-query';
 
 import { useRouter } from 'next/router';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { fetcher, isEmptyObj } from '../../utils';
 import AuthContext from '../../components/Contexts/AuthContext';
 import PageLayout from '../../components/Layout/PageLayout';
@@ -25,7 +25,7 @@ const Item = () => {
   //   `http://localhost:8081/items/likes/${itemId}/users/${user.id}`,
   //   fetcher
   // );
-  const { data: userLike, isSucess: loadingUserLike } = useQuery(
+  const { data: userLike, isSuccess } = useQuery(
     ['userLike', itemId, user.id],
     getAllUserLikes
   );
@@ -43,7 +43,6 @@ const Item = () => {
   if (error) return 'An error has occurred.';
   if (!item) return '';
 
-  console.log(userLike);
   return (
     <PageLayout title='TIC2601 Ecommerce'>
       <h1>{item.data[0] && item.data[0].itemName}</h1>
