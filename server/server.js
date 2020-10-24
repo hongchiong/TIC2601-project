@@ -48,7 +48,6 @@ app.get('/categories', (req, res) => {
   );
 });
 
-
 app.post('/login', (req, res) => {
   db.query(
     `SELECT id, email, address, name, admin FROM users WHERE users.email="${req.body.email}" AND users.password="${req.body.password}";`,

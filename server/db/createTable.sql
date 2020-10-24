@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `items` (
   `name` varchar(65),
   `price` INT,
   `quantity` INT,
+  `description` MEDIUMTEXT,
   `category_id` INT,
   `modifyTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
