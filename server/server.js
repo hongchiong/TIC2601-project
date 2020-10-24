@@ -104,6 +104,34 @@ app.post('/signup', (req, res) => {
   );
 });
 
+app.post('/likes', (req, res) => {
+  db.query(
+    `INSERT INTO like_items (user_id, user_id) VALUES ("${req.body.user_id}", "${req.body.user_id}")`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Items retrieved successfully.',
+      });
+    }
+  );
+});
+
+app.get('/searchbyCategories', (req, res) => {
+  db.query(
+    'SELECT * FROM items WHERE EXISTS (SELECT * FROM users WHERE items.user_id = users.id) ORDER BY items.modifyTime DESC;',
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Items retrieved successfully.',
+      });
+    }
+  );
+});
+
 var server = app.listen(8081, function () {
   var port = server.address().port;
 
