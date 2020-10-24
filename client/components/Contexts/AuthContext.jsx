@@ -2,9 +2,15 @@
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Router from 'next/router';
+// import Router from 'next/router';
+import { toast } from 'react-toastify';
 
-import { UserLogin, UserSignup } from '../../actions/auth';
+import {
+  UserLogin,
+  UserSignup,
+  LikeItem,
+  DeleteLikeItem,
+} from '../../actions/auth';
 
 const AuthContext = React.createContext({});
 
@@ -18,6 +24,9 @@ class AuthProvider extends Component {
     this.signup = this.signup.bind(this);
     this.logout = this.logout.bind(this);
     this.addToCart = this.addToCart.bind(this);
+    this.emptyCart = this.emptyCart.bind(this);
+    this.likeItem = this.likeItem.bind(this);
+    this.deleteLikeItem = this.deleteLikeItem.bind(this);
 
     this.state = {
       user: {},
@@ -28,6 +37,9 @@ class AuthProvider extends Component {
       signup: this.signup,
       logout: this.logout,
       addToCart: this.addToCart,
+      emptyCart: this.emptyCart,
+      likeItem: this.likeItem,
+      deleteLikeItem: this.deleteLikeItem,
     };
   }
 
@@ -40,8 +52,6 @@ class AuthProvider extends Component {
   }
 
   async addToCart(item) {
-    console.log(item);
-
     for (let i = 0; i < this.state.cart.length; i++) {
       if (this.state.cart[i].id === item.id) {
         const newCart = this.state.cart;
@@ -57,6 +67,31 @@ class AuthProvider extends Component {
     newCart.push({ ...item, quantity: 1 });
     localStorage.setItem('TIC2601Cart', JSON.stringify(newCart));
     this.setState({ cart: newCart });
+  }
+
+  async emptyCart() {
+    localStorage.setItem('TIC2601Cart', JSON.stringify([]));
+    this.setState({ cart: [] });
+  }
+
+  async likeItem(userId, itemId) {
+    const [err, res] = await LikeItem(userId, itemId);
+    if (err) {
+      console.log(err);
+      return;
+    }
+    toast.success(`You liked item ID:${itemId}`);
+    return res;
+  }
+
+  async deleteLikeItem() {
+    const [err, res] = await DeleteLikeItem(userId, itemId);
+    if (err) {
+      console.log(err);
+      return;
+    }
+    toast.success(`You deleted your like on item ID:${itemId}`);
+    return res;
   }
 
   async login(data) {
@@ -81,7 +116,8 @@ class AuthProvider extends Component {
     }
 
     console.log(err, res);
-    this.setState({ user: res.data });
+    localStorage.setItem('TIC2601User', JSON.stringify(res.data.data[0]));
+    this.setState({ user: res.data.data[0] });
     return res;
   }
 

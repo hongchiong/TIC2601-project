@@ -6,9 +6,8 @@ import Button from 'react-bootstrap/Button';
 import { isEmptyObj } from '../utils/index';
 
 const Checkout = () => {
-  const { user, cart } = useContext(AuthContext);
+  const { user, cart, emptyCart } = useContext(AuthContext);
 
-  console.log(user);
   return (
     <PageLayout title='TIC2601 Ecommerce'>
       {cart.map((item) => (
@@ -24,6 +23,10 @@ const Checkout = () => {
               )
             : 0}
         </p>
+
+        <Button variant='primary' onClick={() => emptyCart()}>
+          Empty Cart
+        </Button>
         <Button
           variant='primary'
           onClick={() => alert('checkout endpoint')}

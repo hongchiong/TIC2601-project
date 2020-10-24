@@ -31,6 +31,68 @@ app.get('/users/:userId', (req, res) => {
   });
 });
 
+//Get all items by this user
+app.get('/items/me/:userId', (req, res) => {
+  db.query(`SELECT * FROM items WHERE items.user_id = ${req.params.userId};`, (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Items retrieved successfully.',
+    });
+  });
+});
+
+//Get all likes by user
+app.get('/likes/me/:userId', (req, res) => {
+  db.query(`SELECT * FROM like_items INNER JOIN items ON items.id = like_items.item_id WHERE like_items.user_id = ${req.params.userId};`, (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Items retrieved successfully.',
+    });
+  });
+});
+
+//Get all comments SENT by user
+app.get('/comments/me/:userId', (req, res) => {
+  db.query(`SELECT * FROM comments INNER JOIN users ON users.id = comments.receiver_id WHERE comments.sender_id = ${req.params.userId};`, (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Items retrieved successfully.',
+    });
+  });
+});
+
+//Get all comments RECEIVED by user
+app.get('/comments/users/:userId', (req, res) => {
+  db.query(`SELECT * FROM comments INNER JOIN users ON users.id = comments.sender_id WHERE comments.receiver_id = ${req.params.userId};`, (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Items retrieved successfully.',
+    });
+  });
+});
+
+//Get all orders by user
+//Get all comments SENT by user
+app.get('/orders/me/:userId', (req, res) => {
+  db.query(`SELECT * FROM orders INNER JOIN items ON users.id = comments.receiver WHERE comments.sender_id = ${req.params.userId};`, (err, data, fields) => {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      data,
+      message: 'Items retrieved successfully.',
+    });
+  });
+});
+
+
 app.get('/items', (req, res) => {
   db.query(
     'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.name ASC;',
@@ -49,6 +111,20 @@ app.get('/items', (req, res) => {
 app.get('/items/:itemId', (req, res) => {
   db.query(
     `SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id WHERE items.id="${req.params.itemId}";`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Item retrieved successfully.',
+      });
+    }
+  );
+});
+
+app.get('/items/likes/:itemId/users/:userId', (req, res) => {
+  db.query(
+    `SELECT * FROM like_items WHERE like_items.item_id="${req.params.itemId}" AND like_items.user_id="${req.params.userId}";`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
@@ -106,31 +182,32 @@ app.post('/signup', (req, res) => {
 
 app.post('/likes', (req, res) => {
   db.query(
-    `INSERT INTO like_items (user_id, user_id) VALUES ("${req.body.user_id}", "${req.body.user_id}")`,
+    `INSERT INTO like_items (user_id, item_id) VALUES ("${req.body.user_id}", "${req.body.item_id}")`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
         status: 200,
         data,
-        message: 'Items retrieved successfully.',
+        message: 'Item liked successfully.',
       });
     }
   );
 });
 
-app.get('/searchbyCategories', (req, res) => {
+app.delete('/likes', (req, res) => {
   db.query(
-    'SELECT * FROM items WHERE EXISTS (SELECT * FROM users WHERE items.user_id = users.id) ORDER BY items.modifyTime DESC;',
+    `DELETE FROM like_items WHERE like_items.user_id=${req.body.user_id} AND like_items.item_id=${req.body.item_id}`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
         status: 200,
         data,
-        message: 'Items retrieved successfully.',
+        message: 'Item Deleted successfully.',
       });
     }
   );
 });
+
 
 var server = app.listen(8081, function () {
   var port = server.address().port;
