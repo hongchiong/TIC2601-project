@@ -162,6 +162,20 @@ app.get('/items', (req, res) => {
   );
 });
 
+//delete all items from database
+app.delete('/delete_all_items', (req, res) => {
+  db.query(
+    'DELETE FROM items;',
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'All items deleted successfully.',
+      });
+    }
+  );
+});
 
 app.get('/items/:itemId', (req, res) => {
   db.query(
