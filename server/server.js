@@ -34,6 +34,21 @@ app.get('/items', (req, res) => {
   );
 });
 
+// allow user to post item for sell
+app.post('/postItems', (req, res) => {
+  db.query(
+    `INSERT INTO items (name,price,quantity,description) VALUES ("${req.body.name}", "${req.body.price}", "${req.body.quantity}", "${req.body.description}")`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Posted item successfully.',
+      });
+    }
+  );
+});
+
 app.get('/categories', (req, res) => {
   db.query(
     'SELECT * FROM categories;',
@@ -80,31 +95,82 @@ app.post('/signup', (req, res) => {
 
 app.post('/likes', (req, res) => {
   db.query(
-    `INSERT INTO like_items (user_id, user_id) VALUES ("${req.body.user_id}", "${req.body.user_id}")`,
+    `INSERT INTO like_items (user_id, item_id) VALUES ("${req.body.user_id}", "${req.body.item_id}")`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
         status: 200,
         data,
-        message: 'Items retrieved successfully.',
+        message: 'Liked Items retrieved successfully.',
       });
     }
   );
 });
 
-app.get('/searchbyCategories', (req, res) => {
+app.post('/orderItems', (req, res) => {
   db.query(
-    'SELECT * FROM items WHERE EXISTS (SELECT * FROM users WHERE items.user_id = users.id) ORDER BY items.modifyTime DESC;',
+    `INSERT INTO order_items (order_id, item_id, quantity) VALUES ("${req.body.order_id}", "${req.body.item_id}", "${req.body.order_items.quantity}")`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
         status: 200,
         data,
-        message: 'Items retrieved successfully.',
+        message: 'Ordered Items retrieved successfully.',
       });
     }
   );
 });
+
+
+
+app.put('/checkout', (req, res) => {
+  db.query(
+    `UPDATE items SET quantity = quantity - "${req.body.order_items.quantity}" WHERE EXISTS (SELECT * FROM order_items WHERE items.id = order_items.item_id);`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Checkout retrieved successfully.',
+      });
+    }
+  );
+});
+
+app.get('/searchBar', (req, res) => {
+  db.query(
+    `SELECT * FROM items WHERE EXISTS (SELECT * FROM categories WHERE items.category_id = categories.id AND categories.category = ${req.params.categories.category})`,
+    (err, data, fields) => {
+      if (err) throw err;
+    });
+      
+  db.query(
+      `SELECT * FROM items WHERE items.name = ${req.params.items.name}`,
+      (err, data, fields) => {
+        if (err) throw err;    
+      });
+
+      res.json({
+        status: 200,
+        data,
+        message: 'Search Bar retrieved successfully.',
+      });
+});
+
+app.post('/createAdminUser', (req, res) => {
+  db.query(
+    `INSERT INTO users (id, email, password, name, address, admin) VALUES ("${req.body.id}", "${req.body.email}", "${req.body.password}", "${req.body.name}", "${req.body.address}", "${req.body.admin}")`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Function of create new user only applicable to admin.',
+      });
+    }
+  );
+});
+
 
 var server = app.listen(8081, function () {
   var port = server.address().port;
