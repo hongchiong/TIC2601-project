@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Link from 'next/link';
+import AuthContext from '../Contexts/AuthContext';
 
 import { useQuery } from 'react-query';
 import Button from 'react-bootstrap/Button';
-import { getUserItems } from '../../actions/auth';
+import { getUserItems, DeleteItem } from '../../actions/auth';
 
 const Items = ({ userData, me }) => {
   const { data: userItems, isSuccess } = useQuery(
@@ -13,6 +14,8 @@ const Items = ({ userData, me }) => {
       enabled: userData,
     }
   );
+
+  const { setShowModal, addToCart } = useContext(AuthContext);
 
   return (
     <div className='items-root'>
@@ -35,7 +38,20 @@ const Items = ({ userData, me }) => {
               </p>
 
               {me ? (
-                <Button variant='primary'>Edit</Button>
+                <div className='button-group'>
+                  <Button
+                    variant='warning'
+                    onClick={() => setShowModal(`editItem${item.id}`)}>
+                    Edit
+                  </Button>
+                  <Button
+                    variant='danger'
+                    onClick={() => {
+                      DeleteItem(item.id);
+                    }}>
+                    Delete
+                  </Button>
+                </div>
               ) : (
                 <Button
                   variant='primary'
@@ -48,6 +64,11 @@ const Items = ({ userData, me }) => {
             </div>
           ))}
       </div>
+      {me && (
+        <Button variant='primary' onClick={() => setShowModal('postItem')}>
+          Post Item
+        </Button>
+      )}
       <style jsx>{`
         .items-root {
           padding: 2% 0;
@@ -55,7 +76,6 @@ const Items = ({ userData, me }) => {
         .items-container {
           display: flex;
           flex-wrap: wrap;
-          justify-content: space-between;
         }
 
         .items-card {

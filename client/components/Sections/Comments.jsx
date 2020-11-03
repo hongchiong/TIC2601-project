@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { useQuery } from 'react-query';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { getUserComments, postComment } from '../../actions/auth';
+import {
+  getUserComments,
+  postComment,
+  getUserSentComments,
+} from '../../actions/auth';
 
 const Comments = ({ userData, me, loggedInUserId }) => {
   const [form, setForm] = useState('');
@@ -16,18 +20,46 @@ const Comments = ({ userData, me, loggedInUserId }) => {
     }
   );
 
+  const { data: userSentComments, isSuccess: isSuccess2 } = useQuery(
+    ['userSentComments', userData.data[0].id],
+    getUserSentComments,
+    {
+      enabled: userData,
+    }
+  );
+
+  console.log(userSentComments);
+
   return (
     <div className='comments-root'>
       <div className='comments-container'>
-        {isSuccess &&
-          userComments.data.map((comment) => (
-            <div className='comment-container'>
-              <Link href={`/users/${comment.sender_id}`} passHref>
-                <a href={`/users/${comment.sender_id}`}>{comment.name}</a>
-              </Link>{' '}
-              commented: {comment.comment}
-            </div>
-          ))}
+        <div className='received-comments'>
+          {isSuccess && userComments.data[0] && <h4>Received Comments</h4>}
+          {isSuccess &&
+            userComments.data.map((comment) => (
+              <div className='comment-container'>
+                <Link href={`/users/${comment.sender_id}`} passHref>
+                  <a href={`/users/${comment.sender_id}`}>{comment.name}</a>
+                </Link>{' '}
+                commented: {comment.comment}
+              </div>
+            ))}
+        </div>
+        <div className='sent-comments'>
+          {me && isSuccess2 && userSentComments.data[0] && (
+            <h4>Sent Comments</h4>
+          )}
+          {me &&
+            isSuccess2 &&
+            userSentComments.data.map((comment) => (
+              <div className='comment-container'>
+                You commented: {comment.comment} -->{' '}
+                <Link href={`/users/${comment.sender_id}`} passHref>
+                  <a href={`/users/${comment.sender_id}`}>{comment.name}</a>
+                </Link>
+              </div>
+            ))}
+        </div>
       </div>
       {!me && (
         <div className='comment-form'>
@@ -67,6 +99,10 @@ const Comments = ({ userData, me, loggedInUserId }) => {
 
         .comment-form {
           margin-top: 5%;
+        }
+
+        h4 {
+          margin-bottom: 12px;
         }
       `}</style>
     </div>

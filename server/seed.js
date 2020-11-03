@@ -3,7 +3,7 @@ var faker = require('faker');
 
 //add one admin account
 db.query(
-  `INSERT INTO users (email, password, name, address, admin) VALUES ("admin", "password123", "Admin", "National University of Singapore", true);`,
+  `INSERT INTO users (email, password, name, address, admin) VALUES ("admin@gmail.com", "password123", "Admin", "National University of Singapore", true);`,
   (err, data, fields) => {
     if (err) throw err;
   }

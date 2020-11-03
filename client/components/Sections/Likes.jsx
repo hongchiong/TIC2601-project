@@ -14,9 +14,6 @@ const Likes = ({ userData, me }) => {
       enabled: userData,
     }
   );
-
-  console.log(userLikedItems);
-
   return (
     <div className='likes-root'>
       <div className='likes-container'>

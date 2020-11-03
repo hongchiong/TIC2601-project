@@ -4,8 +4,19 @@ import Head from 'next/head';
 import AuthContext from '../Contexts/AuthContext';
 import { isEmptyObj } from '../../utils';
 import { Navbar, Nav, Container, Button, Modal, Form } from 'react-bootstrap';
+import { CreateItem, EditItem, EditUser } from '../../actions/auth';
 
 const PageLayout = ({ title, children }) => {
+  const {
+    login,
+    signup,
+    cart,
+    user,
+    logout,
+    showModal,
+    setShowModal,
+  } = useContext(AuthContext);
+
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [form, setForm] = useState({
@@ -15,8 +26,14 @@ const PageLayout = ({ title, children }) => {
     address: '',
   });
 
-  const { login, signup, cart, user, logout } = useContext(AuthContext);
+  const [itemForm, setItemForm] = useState({
+    user_id: user.id,
+    name: '',
+    price: 0,
+    quantity: 0,
+  });
 
+  console.log(showModal);
   return (
     <>
       <Head>
@@ -56,9 +73,15 @@ const PageLayout = ({ title, children }) => {
                 </Button>
               )}
             </div>
-            {!isEmptyObj(user) && (
+            {!isEmptyObj(user) && user.admin !== 1 && (
               <Link href={`/users/${user.id}`} passHref>
-                <a href={`/users/${user.id}`}>My Account</a>
+                <a href={`/users/${user.id}`}>My Dashboard</a>
+              </Link>
+            )}
+
+            {!isEmptyObj(user) && user.admin === 1 && (
+              <Link href={`/admin`} passHref>
+                <a href={`/admin`}>Admin Dashboard</a>
               </Link>
             )}
 
@@ -166,6 +189,220 @@ const PageLayout = ({ title, children }) => {
             </Form.Group>
             <Button variant='primary' type='submit'>
               Signup
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={showModal === 'editUser'} onHide={() => setShowModal('')}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Account Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              EditUser(form);
+              setForm({ email: '', password: '', name: '', address: '' });
+            }}>
+            <Form.Group controlId='formBasicEmail'>
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type='email'
+                placeholder='Enter email'
+                value={form.email}
+                onChange={(e) =>
+                  setForm({ ...form, email: e.target.value, user_id: user.id })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group controlId='formBasicPassword'>
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type='password'
+                placeholder='Password'
+                value={form.password}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    password: e.target.value,
+                    user_id: user.id,
+                  })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type='text'
+                placeholder='Name'
+                value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value, user_id: user.id })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Address</Form.Label>
+              <Form.Control
+                type='text'
+                placeholder='Address'
+                value={form.address}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    address: e.target.value,
+                    user_id: user.id,
+                  })
+                }
+              />
+            </Form.Group>
+            <Button variant='primary' type='submit'>
+              Edit Account Details
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={showModal === 'postItem'} onHide={() => setShowModal('')}>
+        <Modal.Header closeButton>
+          <Modal.Title>Post Item</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              CreateItem(itemForm);
+              setItemForm({
+                user_id: user.id,
+                name: '',
+                price: 0,
+                quantity: 0,
+              });
+            }}>
+            <Form.Group controlId='formBasicEmail'>
+              <Form.Label>Item Name</Form.Label>
+              <Form.Control
+                type='text'
+                placeholder='Enter item name'
+                value={itemForm.name}
+                onChange={(e) =>
+                  setItemForm({
+                    ...itemForm,
+                    name: e.target.value,
+                    user_id: user.id,
+                  })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group controlId='formBasicPassword'>
+              <Form.Label>Price</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='price'
+                value={itemForm.price}
+                onChange={(e) =>
+                  setItemForm({
+                    ...itemForm,
+                    price: e.target.value,
+                    user_id: user.id,
+                  })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Quantity</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='quantity'
+                value={itemForm.quantity}
+                onChange={(e) =>
+                  setItemForm({
+                    ...itemForm,
+                    quantity: e.target.value,
+                    user_id: user.id,
+                  })
+                }
+              />
+            </Form.Group>
+            <Button variant='primary' type='submit'>
+              Post Item
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={showModal.slice(0, 8) === 'editItem'}
+        onHide={() => setShowModal('')}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Item</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              EditItem(itemForm);
+              setItemForm({
+                user_id: user.id,
+                name: '',
+                price: 0,
+                quantity: 0,
+              });
+            }}>
+            <Form.Group controlId='formBasicEmail'>
+              <Form.Label>Item Name</Form.Label>
+              <Form.Control
+                type='text'
+                placeholder='Enter item name'
+                value={itemForm.name}
+                onChange={(e) =>
+                  setItemForm({
+                    ...itemForm,
+                    name: e.target.value,
+                    user_id: user.id,
+                    item_id: showModal.slice(8),
+                  })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group controlId='formBasicPassword'>
+              <Form.Label>Price</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='price'
+                value={itemForm.price}
+                onChange={(e) =>
+                  setItemForm({
+                    ...itemForm,
+                    price: e.target.value,
+                    user_id: user.id,
+                    item_id: showModal.slice(8),
+                  })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Quantity</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='quantity'
+                value={itemForm.quantity}
+                onChange={(e) =>
+                  setItemForm({
+                    ...itemForm,
+                    quantity: e.target.value,
+                    user_id: user.id,
+                    item_id: showModal.slice(8),
+                  })
+                }
+              />
+            </Form.Group>
+            <Button variant='primary' type='submit'>
+              Edit Item
             </Button>
           </Form>
         </Modal.Body>

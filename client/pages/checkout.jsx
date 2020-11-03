@@ -13,9 +13,12 @@ const Checkout = () => {
   return (
     <PageLayout title='TIC2601 Ecommerce'>
       <div className='cart-root'>
-        {cart.map((item) => (
-          <ProductListView item={item} />
-        ))}
+        <div className='cart-items-list'>
+          {cart.map((item) => (
+            <ProductListView item={item} />
+          ))}
+        </div>
+
         <div className='cart-details'>
           <p>
             Total Cost: $
@@ -51,6 +54,12 @@ const Checkout = () => {
       <style jsx>{`
         .cart-root {
           padding: 2% 0;
+        }
+
+        .cart-items-list {
+          height: 70vh;
+          border: 1px solid #dddddd;
+          border-radius: 12px;
         }
 
         .cart-details {

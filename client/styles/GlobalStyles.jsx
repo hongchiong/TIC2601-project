@@ -19,6 +19,10 @@ const GlobalStyles = () => (
       label {
         margin: 0;
       }
+
+      .btn-warning {
+        margin-right: 8px;
+      }
     `}
   </style>
 );

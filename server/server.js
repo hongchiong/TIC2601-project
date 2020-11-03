@@ -7,8 +7,7 @@ var bodyParser = require('body-parser');
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => res.send('Hello World!'));
-
+//Get all users
 app.get('/users', (req, res) => {
   db.query('SELECT id, email, address, name, admin FROM users;', (err, data, fields) => {
     if (err) throw err;
@@ -20,6 +19,7 @@ app.get('/users', (req, res) => {
   });
 });
 
+//Get User by ID
 app.get('/users/:userId', (req, res) => {
   db.query(`SELECT id, email, address, name, admin FROM users WHERE users.id=${req.params.userId};`, (err, data, fields) => {
     if (err) throw err;
@@ -29,6 +29,35 @@ app.get('/users/:userId', (req, res) => {
       message: 'Users retrieved successfully.',
     });
   });
+});
+
+//Edit User
+app.put('/users', (req, res) => {
+  db.query(
+    `UPDATE users SET name = "${req.body.name}", email = "${req.body.email}", address = "${req.body.address}", password = "${req.body.password}" WHERE users.id = ${req.body.user_id};`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.status(200).json({
+        data,
+        message: 'Item edited successfully',
+      });
+    }
+  );
+});
+
+//Delete User by ID
+app.delete('/users/:userId', (req, res) => {
+  db.query(
+    `DELETE FROM users WHERE users.id=${req.params.userId};`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'User Deleted successfully.',
+      });
+    }
+  );
 });
 
 //Get all items by this user
@@ -148,9 +177,15 @@ app.post('/orders', (req, res) => {
   );
 });
 
+//get all items. with sorting selector
 app.get('/items', (req, res) => {
+  let dbQuery = 'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.name ASC;';
+  if (req.query.sort === "asc") dbQuery = 'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.price ASC;';
+  if (req.query.sort === "des") dbQuery = 'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.price DESC;';
+
+  console.log(dbQuery)
   db.query(
-    'SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id ORDER BY items.name ASC;',
+    dbQuery,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
@@ -162,7 +197,7 @@ app.get('/items', (req, res) => {
   );
 });
 
-
+//Get item by ID
 app.get('/items/:itemId', (req, res) => {
   db.query(
     `SELECT items.id, user_id, items.name as itemName, price, quantity, email,  users.name as userName, address FROM items INNER JOIN users ON items.user_id = users.id WHERE items.id="${req.params.itemId}";`,
@@ -177,6 +212,51 @@ app.get('/items/:itemId', (req, res) => {
   );
 });
 
+//Create an Item
+app.post('/items', (req, res) => {
+  db.query(
+    `INSERT INTO items (user_id, name, price, quantity, category_id) VALUES (${req.body.user_id}, "${req.body.name}", ${req.body.price}, ${req.body.quantity}, 1);`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.status(200).json({
+        data,
+        message: 'Item created successfully',
+      });
+    }
+  );
+});
+
+//Edit an Item
+app.put('/items', (req, res) => {
+  db.query(
+    `UPDATE items SET name = "${req.body.name}", price = ${req.body.price}, quantity = ${req.body.quantity} WHERE items.id = ${req.body.item_id};`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.status(200).json({
+        data,
+        message: 'Item edited successfully',
+      });
+    }
+  );
+});
+
+
+//Delete Item by ID
+app.delete('/items/:itemId', (req, res) => {
+  db.query(
+    `DELETE FROM items WHERE items.id=${req.params.itemId};`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.json({
+        status: 200,
+        data,
+        message: 'Item Deleted successfully.',
+      });
+    }
+  );
+});
+
+//Get Items Liked by this user
 app.get('/items/likes/:itemId/users/:userId', (req, res) => {
   db.query(
     `SELECT * FROM like_items WHERE like_items.item_id="${req.params.itemId}" AND like_items.user_id="${req.params.userId}";`,
@@ -191,6 +271,7 @@ app.get('/items/likes/:itemId/users/:userId', (req, res) => {
   );
 });
 
+//Get all categories
 app.get('/categories', (req, res) => {
   db.query(
     'SELECT * FROM categories;',
@@ -205,6 +286,7 @@ app.get('/categories', (req, res) => {
   );
 });
 
+//Login user
 app.post('/login', (req, res) => {
   db.query(
     `SELECT id, email, address, name, admin FROM users WHERE users.email="${req.body.email}" AND users.password="${req.body.password}";`,
@@ -222,6 +304,7 @@ app.post('/login', (req, res) => {
   );
 });
 
+//Signup user
 app.post('/signup', (req, res) => {
   db.query(
     `INSERT INTO users (email, password, name, address, admin) VALUES ("${req.body.email}", "${req.body.password}", "${req.body.name}", "${req.body.address}", false);`,
@@ -235,9 +318,10 @@ app.post('/signup', (req, res) => {
   );
 });
 
+//Create a like
 app.post('/likes', (req, res) => {
   db.query(
-    `INSERT INTO like_items (user_id, item_id) VALUES ("${req.body.user_id}", "${req.body.item_id}")`,
+    `INSERT INTO like_items (user_id, item_id) VALUES ("${req.body.user_id}", "${req.body.item_id}");`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({
@@ -249,9 +333,10 @@ app.post('/likes', (req, res) => {
   );
 });
 
+//Delete a like
 app.delete('/likes', (req, res) => {
   db.query(
-    `DELETE FROM like_items WHERE like_items.user_id=${req.body.user_id} AND like_items.item_id=${req.body.item_id}`,
+    `DELETE FROM like_items WHERE like_items.user_id=${req.body.user_id} AND like_items.item_id=${req.body.item_id};`,
     (err, data, fields) => {
       if (err) throw err;
       res.json({

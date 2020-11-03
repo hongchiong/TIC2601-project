@@ -27,11 +27,13 @@ class AuthProvider extends Component {
     this.emptyCart = this.emptyCart.bind(this);
     this.likeItem = this.likeItem.bind(this);
     this.deleteLikeItem = this.deleteLikeItem.bind(this);
+    this.setShowModal = this.setShowModal.bind(this);
 
     this.state = {
       user: {},
       cart: [],
       loading: false,
+      showModal: '',
 
       login: this.login,
       signup: this.signup,
@@ -40,6 +42,7 @@ class AuthProvider extends Component {
       emptyCart: this.emptyCart,
       likeItem: this.likeItem,
       deleteLikeItem: this.deleteLikeItem,
+      setShowModal: this.setShowModal,
     };
   }
 
@@ -49,6 +52,10 @@ class AuthProvider extends Component {
 
     this.setState({ user: loggedInUser ? loggedInUser : {} });
     this.setState({ cart: savedCart ? savedCart : [] });
+  }
+
+  setShowModal(modal) {
+    this.setState({ showModal: modal });
   }
 
   async addToCart(item) {
