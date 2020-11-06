@@ -104,8 +104,8 @@ class AuthProvider extends Component {
   async login(data) {
     const [err, res] = await UserLogin(data);
 
-    if (err) {
-      console.log(err);
+    if (res.status === 204 || err) {
+      toast.error("User account doesn't exist. Please sign up.");
       return;
     }
 
